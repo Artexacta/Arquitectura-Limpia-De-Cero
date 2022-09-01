@@ -10,6 +10,12 @@ Los únicos prerequisitos para seguir este repositorio es tener instalados:
 
 * Visual Studio 2022 
 * Sql Server 2019 (junto con el Sql Server Management Studio)
+* Visual Studio Code
+
+# Plugins adicionales en VS Code
+
+Algunos de los que sugieren para el desarrollo del front-end (al parecer VS Code es mejor editor para JS)
+
 
 ## Desarrollo
 

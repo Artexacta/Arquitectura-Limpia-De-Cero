@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32317.152
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Segundo", "Segundo\Segundo.csproj", "{11A14F9C-FF9F-4096-BF8D-E2AFD4AFC06B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSegundo", "TestSegundo\TestSegundo.csproj", "{82443068-0981-4C8C-98BE-174F28BA9D8F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11A14F9C-FF9F-4096-BF8D-E2AFD4AFC06B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11A14F9C-FF9F-4096-BF8D-E2AFD4AFC06B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11A14F9C-FF9F-4096-BF8D-E2AFD4AFC06B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11A14F9C-FF9F-4096-BF8D-E2AFD4AFC06B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82443068-0981-4C8C-98BE-174F28BA9D8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82443068-0981-4C8C-98BE-174F28BA9D8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82443068-0981-4C8C-98BE-174F28BA9D8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82443068-0981-4C8C-98BE-174F28BA9D8F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {28C80E9E-A4BD-4038-B949-E4C385FF778C}
+	EndGlobalSection
+EndGlobal
