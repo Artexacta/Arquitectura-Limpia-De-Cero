@@ -24,6 +24,11 @@ los proyectos que se encuentran en las subcarpetas. En cada una de las subcarpet
 un archivo Readme con toda la información de cuáles han sido los pasos para poder lograr la solución
 que se encuentra en el repositorio.
 
+De todas maneras aquí están los enlaces a cada uno:
+
+* [Primero](https://github.com/Artexacta/Arquitectura-Limpia-De-Cero/tree/main/Primero)
+* [Segundo](https://github.com/Artexacta/Arquitectura-Limpia-De-Cero/tree/main/Segundo)
+
 ## Sobre los autores
 
 No se puede decir que hay un solo autor para todo este contenido. En realidad es el cúmulo del 
