@@ -1,0 +1,33 @@
+﻿@model List<Tercero.ViewModels.ProductoViewModel>
+
+<html>
+    <body>
+        <h1>Lista de productos</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre Producto</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+            @if (Model.Count > 0)
+            {
+                foreach(var item in Model)
+                {
+                    <tr>
+                        <td>@item.Nombre</td>
+                        <td>@item.Precio</td>
+                    </tr>
+                }
+            }else
+            {
+                <tr>
+                    <td colspan="2">No hay productos</td>
+                </tr>
+            }            
+            </tbody>
+        </table>
+    </body>
+</html>
