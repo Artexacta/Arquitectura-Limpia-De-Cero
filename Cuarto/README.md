@@ -493,13 +493,83 @@ el ícono [fontawesome](https://fontawesome.com/icons/pen-to-square?s=regular&f=
 ![IconEdit](images/iconedit.png)
 
 23. Revisar el resultado correcto de la página. Se debe ejecutar la aplicación
-y navegar a la dirección Producto/Index 
+y navegar a la dirección Producto/Index. Esta vista ya tiene una vista profesional
+y responsive que se adapta al tamaño de cualquier dispositivo y se ve naturalmente
+bien en cualquier pantalla.
 
 ![Index](images/index.png)
 
-21. Crear el método Insert en el controlador usando exclusivamente el
-mediator. En este caso, al insertar un nuevo producto, necesitamos un 
-parámetro que es justamente el producto.
+## Implementar el ciclo controlador / vista para la inserción 
+
+24. Al principio de hacer una inserción, el formulario para la inserción
+debe estar vacío. Pero se debe llamar a la vista de Insertar. Entonces, la
+diferencia es que para llamar al formulario vacío se hace un GET y para 
+pasar el parámetro Producto del formulario se hace un POST. Crear el método
+Insert para el método HttpGet.
+```
+[HttpGet]
+public IActionResult Insert()
+{
+	return View();
+}
+```
+
+25. Crear la vista que tiene el formulario para insertar un producto. Lo
+primero es colocar el modelo que es un ProductoViewModelo
+```
+@model Cuarto.ViewModels.ProductoViewModel
+
+<h1>Nuevo Producto</h1>
+```
+
+26. Crear el formulario para llamar a Insert, pero esta vez con el método
+POST. Todo lo que esté dentro del formulario se mapeará al modelo de la
+página.
+```
+<form asp-action="Insert" method="post">
+    ...
+</form>
+```
+
+27. Definir cada uno de los campos del formulario mapeando directamente al 
+atributo del modelo que corresponda.
+```
+<div class="mb-3">
+	<label class="form-label">Nombre</label>
+	<input class="form-control" asp-for="Nombre" />
+</div>
+<div class="mb-3">
+	<label class="form-label">Precio</label>
+	<input class="form-control" asp-for="Precio" />
+</div>    
+<div class="mb-3">
+	<label class="form-label">Fecha Venc</label>
+	<input class="form-control" asp-for="FechaVencimiento" />
+</div>    
+<div class="mb-3">
+	<label class="form-label">Cantidad</label>
+	<input class="form-control" asp-for="Cantidad" />
+</div>    
+<div class="mb-3">
+	<label class="form-label">Estado</label>
+	<input class="form-control" asp-for="Estado" />
+</div>
+```
+El uso de asp-for enlaza el campo con el atributo de nuestro modelo.
+Esto permite incluso crear un componente visual adecuado para ese
+atributo dependiendo de su tipo.
+
+28. Crear el botón que envía toda la información a la acción Insert
+con el método POST.
+```
+<div class="mb-3">
+	<button type="submit" class="btn btn-primary mb-3">Crear</button>
+</div>
+```
+
+29. Crear la acción Insert en el controlador para el método POST 
+usando exclusivamente el mediator. En este caso, al insertar un nuevo producto, 
+nos pasarán un parámetro que es justamente el ViewModel del producto.
 ```
 [HttpPost]
 public async Task<IActionResult> Insert(ProductoViewModel p)
@@ -513,15 +583,136 @@ viene en una llamada POST de HTTP (típicamente de un form). Luego de
 realizar la inserción redireccionamos a editar ese producto con el 
 nuevo id que se acaba de crear.
 
-22. Al principio de hacer una inserción, el formulario para la inserción
-debe estar vacío. Pero se debe llamar a la vista de Insertar. Entonces, la
-diferencia es que para llamar al formulario vacío se hace un GET y para 
-pasar el parámetro Producto del formulario se hace un POST. Crear el método
-Insert para el método HttpGet.
+30. En el Index se debe configurar la llamada al Insert del método GET para que
+nos muestre el formulario vacío la primera vez. Esto lo hacemos en el botón
+Nuevo que aparece luego del título.
+```
+<a asp-action="Insert" class="btn btn-primary">Nuevo</a> 
+```
+
+## Implementar el ciclo controlador / vista para la edición o actualización
+
+31. Verificar que en la vista de la lista de productos se puede ver el botón
+para editar el producto y que llama con un argumento que tiene el id del producto
+```
+<a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
+	<i class="fa-regular fa-pen-to-square"></i>
+</a>
+```
+Esto nos da la pauta de que la acción se debe llamar Edit y que debe aceptar
+un id. Esta acción debe responder al método GET. 
+
+32. Crear el método Edit para el método HttpGet.
 ```
 [HttpGet]
-public IActionResult Insert()
+public async Task<IActionResult> Edit(Guid id)
 {
-	return View();
+	ProductoViewModel model = 
+		await _mediator.Send(new GetProductoByIdQuery(id));
+	return View(model);
+}
+```
+
+32. Crear la vista que tiene el formulario para editar un producto. Este formulario
+es muy similar al de Insertar un producto solamente que existe un input de tipo
+hidden que tiene el id del Producto. Esto se puede ver en el archivo Edit.cshtml
+de la carpeta Views/Producto
+```
+<form asp-action="Edit" method="post">
+	<input asp-for="Id" type="hidden" />
+	...
+</form>
+```
+
+33. Crear la acción Edit en el controlador para el método POST 
+usando exclusivamente el mediator. Como se vio en el Insert, aquí también 
+se espera como parámetro los nuevos valores del objeto a actualizar
+```
+[HttpPost]
+public async Task<IActionResult> Edit(ProductoViewModel p)
+{
+	EditProductoCommand cmd = new EditProductoCommand(p);
+	ProductoViewModel actualizado = await _mediator.Send(cmd);
+	return RedirectToAction(nameof(Edit), new { id = actualizado.Id });
+}
+```
+Por supuesto, al final se vuelve a la página de edición limpia de ese Producto
+que es justamente la acción Edit con el método GET.
+
+## Implementar el ciclo controlador / vista para eliminar un producto
+
+34. En cada una de las filas que se muestra el producto asegurarse que está el
+enlace para eliminar un producto. En este caso no se utiliza una acción GET y
+solamente se marca el botón con la clase btnEliminar.
+```
+<a href="#" class="text-decoration-none btnEliminar" data-id="@item.Id">
+	<i class="fa-regular fa-square-minus"></i>
+</a>
+```
+
+35. La razón para hacer de esas manera el anterior paso es que queremos mostrar
+el modal con la confirmación para eliminar un producto. Entonces debemos programar
+el evento clic de este botón para que muestre el modal. Esto se realiza al final de
+la vista Index
+```
+@section Scripts {
+	<script type="text/javascript">
+		$(function() {
+			$('.btnEliminar').click(function(e) {
+				e.preventDefault();
+				$('#modalEliminarId').val($(this).data('id'));
+				$('#modalEliminar').modal('show');
+
+				return false;
+			});
+		});
+	</script>
+}
+```
+
+Para que el formulario tenga la información correcta, se coloca el valor del id
+en el campo hidden que está dentro del formulario del modal que llama e eliminar.
+
+36. Crear el modal con el identificador correcto que mostrará el mensaje de
+confirmación de eliminación. Este modal tiene un form adentro que llama a la
+acción Eliminar.
+```
+<div class="modal" tabindex="-1" id="modalEliminar">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmación eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Está usted seguro que desea eliminar este producto?</p>
+      </div>
+      <form method="get" asp-action="Eliminar">
+          <input type="hidden" id="modalEliminarId" name="modalEliminarId" value="" />
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Eliminar</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+```
+
+37. Crear la acción Eliminar para el método GET en el controlador de Producto. 
+En el código hacer uso de mediator y devolver la lista de productos (redirección
+a Index)
+```
+[HttpGet]
+public async Task<IActionResult> Eliminar(Guid modalEliminarId)
+{
+	EliminarProductoCommand cmd = new EliminarProductoCommand(modalEliminarId);
+	bool resultado = await _mediator.Send(cmd);
+
+	if (!resultado)	{ 
+		// error deleting
+	}
+
+	return RedirectToAction(nameof(Index));
 }
 ```

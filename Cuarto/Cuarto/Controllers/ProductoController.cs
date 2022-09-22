@@ -48,10 +48,8 @@ namespace Cuarto.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            Producto p = await _repository.GetProductoById(id);
-
-            ProductoViewModel model = _mapper.Map<ProductoViewModel>(p);
-
+            ProductoViewModel model = 
+                await _mediator.Send(new GetProductoByIdQuery(id));
             return View(model);
         }
 
