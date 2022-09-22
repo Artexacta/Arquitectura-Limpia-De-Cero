@@ -1,0 +1,36 @@
+﻿@model Cuarto.ViewModels.ProductoViewModel
+
+<h1>Editar Producto</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-sm-12 col-xl=6">
+            <form asp-action="Edit" method="post">
+                <input asp-for="Id" type="hidden" />
+                <div class="mb-3">
+                    <label class="form-label">Nombre</label>
+                    <input class="form-control" asp-for="Nombre" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Precio</label>
+                    <input class="form-control" asp-for="Precio" />
+                </div>    
+                <div class="mb-3">
+                    <label class="form-label">Fecha Venc</label>
+                    <input class="form-control" asp-for="FechaVencimiento" />
+                </div>    
+                <div class="mb-3">
+                    <label class="form-label">Cantidad</label>
+                    <input class="form-control" asp-for="Cantidad" />
+                </div>    
+                <div class="mb-3">
+                    <label class="form-label">Estado</label>
+                    <input class="form-control" asp-for="Estado" />
+                </div>
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary mb-3">Actualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,86 @@
+﻿@model List<Cuarto.ViewModels.ProductoViewModel>
+
+<h1>Lista de productos</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+
+            <a asp-action="Insert" class="btn btn-primary">Nuevo</a> 
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>C</th>
+                        <th>E</th>
+                        <th>Nombre Producto</th>
+                        <th>Precio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Count > 0)
+                    {
+                        foreach(var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    </a>     
+                                </td>
+                                <td>
+                                    <a href="#" class="text-decoration-none btnEliminar" data-id="@item.Id">
+                                        <i class="fa-regular fa-square-minus"></i>
+                                    </a>                                     
+                                </td>
+                                <td>@item.Nombre</td>
+                                <td>@item.Precio</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4">No hay productos</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" id="modalEliminar">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmación eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Está usted seguro que desea eliminar este producto?</p>
+      </div>
+      <form method="get" asp-action="Eliminar">
+          <input type="hidden" id="modalEliminarId" name="modalEliminarId" value="" />
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Eliminar</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+<script type="text/javascript">
+$(function() {
+    $('.btnEliminar').click(function(e) {
+        e.preventDefault();
+        $('#modalEliminarId').val($(this).data('id'));
+        $('#modalEliminar').modal('show');
+
+        return false;
+    });
+});
+</script>
+}
