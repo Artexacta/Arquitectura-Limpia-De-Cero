@@ -716,3 +716,10 @@ public async Task<IActionResult> Eliminar(Guid modalEliminarId)
 	return RedirectToAction(nameof(Index));
 }
 ```
+
+## Resultado final
+
+El resultado final es un ABM que se ve muy bien, que es responsivo y fácil de 
+usar
+
+![ABM](images/AnimacionABM.gif)
