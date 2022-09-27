@@ -1,0 +1,23 @@
+﻿@model Application.ViewModels.Productos.ProductoDtoViewModel
+
+<h1>Nuevo Producto</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-sm-12 col-xl=6">
+            <form asp-action="Insert" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Nombre</label>
+                    <input class="form-control" asp-for="Nombre" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Precio</label>
+                    <input class="form-control" asp-for="Precio" />
+                </div>
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary mb-3">Crear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
