@@ -17,5 +17,10 @@ namespace Domain.Models.Pedidos
         {
             get { return Cantidad * PrecioUnitario; }
         }
+
+        public PedidoItem()
+        {
+            Id = Guid.NewGuid();
+        }
     }
 }

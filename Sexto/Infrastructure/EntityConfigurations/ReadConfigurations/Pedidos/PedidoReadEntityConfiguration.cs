@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using Application.Dto.Pedidos;
+using Domain.Models.Shared;
 
 namespace Infrastructure.EntityConfigurations.ReadConfigurations.Pedidos
 {
@@ -16,6 +17,12 @@ namespace Infrastructure.EntityConfigurations.ReadConfigurations.Pedidos
 
             builder.Property(x => x.Descuento)
                 .HasColumnType("decimal(18,4)");
+
+            builder.Property(e => e.Estado)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (EstadoPedido)Enum.Parse(typeof(EstadoPedido), v))
+                .HasMaxLength(50);
         }
     }
 }

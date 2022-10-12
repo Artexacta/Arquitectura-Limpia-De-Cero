@@ -210,9 +210,25 @@ En esta clase se coloca el
 detalle de cómo se va a implementar la tabla en la base de datos. Este contexto
 es el que se utiliza para los update database.
 
+En el caso de que los objetos tengan atributos tipo enum entonces se debe hacer 
+la siguiente conversión para que EF sepa cómo transformarlo:
+```
+builder.Property(e => e.Estado)
+	.HasConversion(
+		v => v.ToString(),
+		v => (EstadoPedido)Enum.Parse(typeof(EstadoPedido), v))
+	.HasMaxLength(50);
+```
+
 25. Crear el Entity Configuration de producto, pedido y pedidoItem para la escritura.
 En esta clase solamente es necesario colocar el tema de la llave (id) de cada una 
 de las tablas.
+
+Para la lectura no olvidar de indicar expresamente que se debe Ignorar el atributo
+DomainEvents que viene heredado de Entity.
+```
+builder.Ignore(x => x.DomainEvents);
+```
 
 26. Colocar la configuración del string de conexión para la aplicación.
 
@@ -259,3 +275,87 @@ de SharedKernel.
 No se hacen repositorios para objetos del dominio que no son agregados y se colocan
 en estos repositorios todos los métodos que se necesiten para guardar y actualizar
 las entidades de este agregado raíz.
+
+32. Colocar la inyección de dependencias en el archivo Extensions.
+
+## Crear los DTOs para la lectura
+
+33. Crear las clases DTO con los campos de solamente lectura que necesitarán 
+las interfaces del sistema.
+
+## Casos de uso de escritura y agregados raíz
+
+Al momento de realizar los casos de uso para el agregado de pedidos es que 
+comienza realmente la programación orientada a eventos. Aquí comenzamos a pensar 
+los eventos que vamos a necesitar para el agregado de pedidos.
+* Crear pedido:  solamente se crea el pedido con una fecha y el estado pendiente
+* Actualizar pedido: Se actualizan los datos de descuento y nombre de cliente
+* Agregar ítem a pedido: Agrega un ítem al pedido revisando primero si hay 
+stock suficiente (pero no reserva stock).
+* Quitar ítem de pedido: Quita un ítem del pedido 
+* Actualizar cantidad de un ítem: Actualiza la cantidad del pedido
+* Confirmar pedido: Este es el método complejo que da lugar a la comunicación entre
+agregados. Se cambia el estado del pedido y se cambia el stock de los productos.
+* Anular pedido: Este también es un método complejo ya que implica revertir la 
+operación anterior y por ende corregir el stock que hay en cada producto que 
+interviene en el pedido.
+
+34. Instalar el package Mediatr en Application
+
+35. Copiar tal cual los comandos y controladores de los casos de uso de los productos.
+
+36. Crear los comandos para el agregado de Pedidos de acuerdo a la descripción anterior
+
+37. Agregar los factories. Y colocarlos en application para que la inyección los vea.
+Esto se hace como transient.
+
+38. Crear el evento que se debe comunicar entre agregados para que otras entidades
+puedan realizar las tareas que corresponden para ese evento en particular
+```
+public record CreatedPedidoPendiente : DomainEvent
+{
+	public Guid Id { get; set; }
+
+	public CreatedPedidoPendiente(Guid id) : base(DateTime.UtcNow)
+	{
+		Id = id;
+	}
+}
+```
+Estos eventos son creados como records y son destinados a solamente tener los valores
+con los cuales son creados, sobre todo el atributo que tiene que ver con el momento
+en el cual son creados.
+
+38. El controlador de crear pedido tiene la siguiente forma:
+```
+public async Task<Guid> Handle(CreatePedidoCommand request, CancellationToken cancellationToken)
+{
+	Pedido nuevoPedido = _pedidoFactory.CreatePedido();
+	await _pedidoRepository.CreateAsync(nuevoPedido);
+	await _unitOfWork.Commit();
+	return nuevoPedido.Id;
+}
+```
+Y la magia comeinza a operar cuando se hace el commit del unit of work.
+
+39. Desempilar todos los eventos que se han quedado en las entidades y publicarlos. 
+Al utilizar el publish del mediator se está implementando un patrón muy parecido al observer 
+que hace que se ejecuten todas las cosas que queremos que se ejecuten una vez que los
+eventos ocurran.
+```
+public async Task Commit()
+{
+	// Publicar eventos del dominio
+	var domainEvents = _context.ChangeTracker.Entries<Entity<Guid>>()
+		.Select(x => x.Entity.DomainEvents)
+		.SelectMany(x => x)
+		.ToArray();
+
+	foreach (var domainEvent in domainEvents)
+	{
+		await _mediator.Publish(domainEvent);
+	}
+	
+	await this._context.SaveChangesAsync();
+}
+```

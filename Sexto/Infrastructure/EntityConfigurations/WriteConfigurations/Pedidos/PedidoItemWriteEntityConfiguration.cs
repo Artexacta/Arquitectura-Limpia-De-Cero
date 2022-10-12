@@ -10,6 +10,8 @@ namespace Infrastructure.EntityConfigurations.WriteConfigurations.Pedidos
         {
             builder.ToTable("PedidoItems");
             builder.HasKey(x => x.Id);
+
+            builder.Ignore(x => x.DomainEvents);
         }
     }
 }

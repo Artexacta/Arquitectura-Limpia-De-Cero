@@ -1,5 +1,9 @@
-﻿using Domain.UnitOfWorkPattern;
+﻿using Domain.Repositories.Pedidos;
+using Domain.Repositories.Productos;
+using Domain.UnitOfWorkPattern;
 using Infrastructure.Contexts;
+using Infrastructure.Repositories.Pedidos;
+using Infrastructure.Repositories.Productos;
 using Infrastructure.UnitOfWorkPattern;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +24,8 @@ namespace Infrastructure.Injections
             services.AddDbContext<ReadDbContext>(context =>
                 context.UseSqlServer(connectionString));
 
+            services.AddScoped<IProductoRepository, ProductoRepository>();
+            services.AddScoped<IPedidoRepository, PedidoRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;

@@ -10,6 +10,8 @@ namespace Infrastructure.EntityConfigurations.WriteConfigurations.Productos
         {
             builder.ToTable("Productos");
             builder.HasKey(x => x.Id);
+
+            builder.Ignore(x => x.DomainEvents);
         }
     }
 }
