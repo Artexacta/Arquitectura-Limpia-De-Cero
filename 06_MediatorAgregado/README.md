@@ -347,7 +347,7 @@ El resultado de la ejecución se puede ver en el siguiente detalle:
       * [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.NotificacionCreadaEvent
       * [UNIT OF WORK] Aquí no hay commit porque TXN counter es 3
       * [Notificar Orden de Cobro] COMMIT
-   * Ya no hay más consumers del evento OrdenDeCobroCreada
+   * **Ya no hay más consumers del evento OrdenDeCobroCreada**
    * [UNIT OF WORK] Aquí no hay commit porque TXN counter es 2
    * [Crear Orden de Cobro] COMMIT
 8. **Se llama al tercer Consumer del evento AlumnoRegistrado**
@@ -357,4 +357,8 @@ El resultado de la ejecución se puede ver en el siguiente detalle:
    * [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.NotificacionCreadaEvent
    * [UNIT OF WORK] Aquí no hay commit porque TXN counter es 2
    * [Notificar Bienvenida] COMMIT
-9. [UNIT OF WORK] Se hace el commit de todos los cambios
+9. **Ya no hay más consumers del evento AlumnoRegistrado**
+10. [UNIT OF WORK] Se hace el commit de todos los cambios
+
+Se puede ver claramente como la ejecución del código sigue tal cual el proceso
+que se había establecido en nuestro diagrama original de eventos.
