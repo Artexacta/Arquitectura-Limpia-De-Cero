@@ -1,4 +1,5 @@
-﻿using MediatorAndAggregate.Models;
+﻿using MediatorAndAggregate.Exceptions;
+using MediatorAndAggregate.Models;
 using MediatorAndAggregate.Repositories;
 using MediatorAndAggregate.UnitOfWorkPattern;
 using MediatorAndAggregate.UseCases.Commands;
@@ -30,6 +31,8 @@ namespace MediatorAndAggregate.UseCases.Handlers
         }
         public async Task<bool> Handle(RegistrarAlumnoEnMateriaCommand request, CancellationToken cancellationToken)
         {
+            ConfiguracionCaso configuracionCaso = ConfiguracionCaso.GetOrCreate();
+
             Alumno alumno = await _alumnoRepository.FindById(request.AlumnoId);
             Materia materia = await _materiaRepository.FindById(request.MateriaId);
             materia.Registrados = await _mediator.Send(new FindRegistradosEnMateriaQuery(request.MateriaId));
@@ -41,6 +44,11 @@ namespace MediatorAndAggregate.UseCases.Handlers
             materia.ConsolidarRegistrado(alumno.Id, alumno.Nombre);
             _logger.LogInformation("[REGISTRAR ALUMNO] Publica el evento y lo pone en la cola");
 
+            if (configuracionCaso.ErrorAlRegistrarAlumno)
+            {
+                _logger.LogInformation("[REGISTRAR ALUMNO] Error al registrar alumno");
+                throw new ConfigCasoException("Error al registrar alumno");
+            }
             await _materiaRepository.RegistrarAlumnoAsync(materia.Id, alumno.Id);
             _logger.LogInformation("[REGISTRAR ALUMNO] Guarda el registro del alumno en esa materia en la base de datos");
             await _unitOfWork.Commit();

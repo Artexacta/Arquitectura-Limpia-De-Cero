@@ -10,11 +10,18 @@
             return instancia;
         }
 
-        private ConfiguracionCaso() { }
+        private ConfiguracionCaso() {
+            ErrorAlActualizarEstadistica = false;
+            ErrorAlCrearCobro = false;
+            ErrorAlNotificarBienvenida = false;
+            ErrorAlNotificarCobro = false;
+            ErrorAlRegistrarAlumno = false;
+        }
         
-        public bool ErrorEnLevel0 { get; set; }
-        public bool ErrorEnLevel1 { get; set; }
-        public bool ErrorEnLevel2 { get; set; }
-        public bool ExecuteLevel2 { get; set; }
+        public bool ErrorAlRegistrarAlumno { get; set; }
+        public bool ErrorAlActualizarEstadistica { get; set; }
+        public bool ErrorAlCrearCobro { get; set; }
+        public bool ErrorAlNotificarBienvenida { get; set; }
+        public bool ErrorAlNotificarCobro { get; set; }
     }
 }

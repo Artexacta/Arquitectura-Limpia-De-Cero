@@ -1,5 +1,6 @@
 ﻿using MediatorAndAggregate.DbContexts;
 using MediatorAndAggregate.Events;
+using MediatorAndAggregate.Exceptions;
 using MediatorAndAggregate.Models;
 using MediatorAndAggregate.Repositories;
 using MediatorAndAggregate.UnitOfWorkPattern;
@@ -29,10 +30,18 @@ namespace MediatorAndAggregate.UseCases.Consumers
 
         public async Task Handle(AlumnoRegistradoEvent notification, CancellationToken cancellationToken)
         {
+            ConfiguracionCaso configuracionCaso = ConfiguracionCaso.GetOrCreate();
+            
             int nbRegistrados = Registrados.Select(x => x.MateriaId == notification.MateriaId).Count();
             // Esto porque el alumno nuevo registrado todavia no está commiteado
             nbRegistrados++;
             Materia materia = await _materiaRepository.FindById(notification.MateriaId);
+
+            if (configuracionCaso.ErrorAlActualizarEstadistica)
+            {
+                _logger.LogInformation("[ACTUALIZAR ESTADISTICA] Error al actualizar estadistica");
+                throw new ConfigCasoException("Error al actualizar estadistica");
+            }
 
             materia.ActualizarEstadistica(nbRegistrados);            
             _logger.LogInformation($"[CONSUMER: ACTUALIZAR ESTADISTICA] Se actualiza la estadistica de la materia {notification.MateriaId} con {nbRegistrados} registrados");
