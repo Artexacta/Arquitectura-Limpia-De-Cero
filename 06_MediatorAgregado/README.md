@@ -327,29 +327,29 @@ El resultado de la ejecución se puede ver en el siguiente detalle:
 2. [REGISTRAR ALUMNO] Registra alumno en materia (en dominio solamente)
 3. [REGISTRAR ALUMNO] Publica el evento y lo pone en la cola
 4. [REGISTRAR ALUMNO] Guarda el registro del alumno en esa materia en la base de datos
-	5. [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.AlumnoRegistradoEvent
-	6. [CONSUMER: ACTUALIZAR ESTADISTICA] Se actualiza la estadistica de la materia 7e07532a-7af6-4c8c-af83-3a164751bb0b con 1 registrados
-	7. [CONSUMER: ACTUALIZAR ESTADISTICA] Se lanza el evento de Estadistica Actualizada
-	8. [CONSUMER: ACTUALIZAR ESTADISTICA] El cambio en el objeto hace el update automáticamente
-	9. [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.EstadisticaMateriaActualizadaEvent
-	10. [UNIT OF WORK] Aquí no hay commit porque TXN counter es 2
-	11. [CONSUMER: ACTUALIZAR ESTADISTICA] COMMIT
-	12. [Crear Orden de Cobro] Se crea la orden de cobro a Hugo
-	13. [Crear Orden de Cobro] Se lanza el evento Orden de Cobro Creada
-	14. [Crear Orden de Cobro] Se guarda la orden de cobro en la base de datos
-	15. [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.OrdenDeCobroCreadaEvent
-	16. [Notificar Orden de Cobro] Notificacion creada: a11d2853-cc24-4a3d-ac1c-f15fbdff63d2
-	17. [Notificar Orden de Cobro] Comunicar evento Notificacion Creada
-	18. [Notificar Orden de Cobro] Guardar en base de datos
-	19. [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.NotificacionCreadaEvent
-	20. [UNIT OF WORK] Aquí no hay commit porque TXN counter es 3
-	21. [Notificar Orden de Cobro] COMMIT
-	22. [UNIT OF WORK] Aquí no hay commit porque TXN counter es 2
-	23. [Crear Orden de Cobro] COMMIT
-	24. [Notificar Bienvenida] Notificacion creada: bd9d536c-83ea-4e5f-9ace-576a5450344b
-	25. [Notificar Bienvenida] Comunicar evento Notificacion Creada
-	26. [Notificar Bienvenida] Grabar la notificación en la base de datos
-	27. [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.NotificacionCreadaEvent
-	28. [UNIT OF WORK] Aquí no hay commit porque TXN counter es 2
-	29. [Notificar Bienvenida] COMMIT
+  1. [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.AlumnoRegistradoEvent
+    1. [CONSUMER: ACTUALIZAR ESTADISTICA] Se actualiza la estadistica de la materia 7e07532a-7af6-4c8c-af83-3a164751bb0b con 1 registrados
+    2. [CONSUMER: ACTUALIZAR ESTADISTICA] Se lanza el evento de Estadistica Actualizada
+    3. [CONSUMER: ACTUALIZAR ESTADISTICA] El cambio en el objeto hace el update automáticamente
+      1. [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.EstadisticaMateriaActualizadaEvent
+      2. [UNIT OF WORK] Aquí no hay commit porque TXN counter es 2
+11. [CONSUMER: ACTUALIZAR ESTADISTICA] COMMIT
+12. [Crear Orden de Cobro] Se crea la orden de cobro a Hugo
+13. [Crear Orden de Cobro] Se lanza el evento Orden de Cobro Creada
+14. [Crear Orden de Cobro] Se guarda la orden de cobro en la base de datos
+15. [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.OrdenDeCobroCreadaEvent
+16. [Notificar Orden de Cobro] Notificacion creada: a11d2853-cc24-4a3d-ac1c-f15fbdff63d2
+17. [Notificar Orden de Cobro] Comunicar evento Notificacion Creada
+18. [Notificar Orden de Cobro] Guardar en base de datos
+19. [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.NotificacionCreadaEvent
+20. [UNIT OF WORK] Aquí no hay commit porque TXN counter es 3
+21. [Notificar Orden de Cobro] COMMIT
+22. [UNIT OF WORK] Aquí no hay commit porque TXN counter es 2
+23. [Crear Orden de Cobro] COMMIT
+24. [Notificar Bienvenida] Notificacion creada: bd9d536c-83ea-4e5f-9ace-576a5450344b
+25. [Notificar Bienvenida] Comunicar evento Notificacion Creada
+26. [Notificar Bienvenida] Grabar la notificación en la base de datos
+27. [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.NotificacionCreadaEvent
+28. [UNIT OF WORK] Aquí no hay commit porque TXN counter es 2
+29. [Notificar Bienvenida] COMMIT
 30. [UNIT OF WORK] Se hace el commit de todos los cambios
