@@ -327,12 +327,12 @@ El resultado de la ejecución se puede ver en el siguiente detalle:
 2. [REGISTRAR ALUMNO] Registra alumno en materia (en dominio solamente)
 3. [REGISTRAR ALUMNO] Publica el evento y lo pone en la cola
 4. [REGISTRAR ALUMNO] Guarda el registro del alumno en esa materia en la base de datos
-  1. [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.AlumnoRegistradoEvent
-    1. [CONSUMER: ACTUALIZAR ESTADISTICA] Se actualiza la estadistica de la materia 7e07532a-7af6-4c8c-af83-3a164751bb0b con 1 registrados
-    2. [CONSUMER: ACTUALIZAR ESTADISTICA] Se lanza el evento de Estadistica Actualizada
-    3. [CONSUMER: ACTUALIZAR ESTADISTICA] El cambio en el objeto hace el update automáticamente
-      1. [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.EstadisticaMateriaActualizadaEvent
-      2. [UNIT OF WORK] Aquí no hay commit porque TXN counter es 2
+   * [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.AlumnoRegistradoEvent
+      * [CONSUMER: ACTUALIZAR ESTADISTICA] Se actualiza la estadistica de la materia 7e07532a-7af6-4c8c-af83-3a164751bb0b con 1 registrados
+      * [CONSUMER: ACTUALIZAR ESTADISTICA] Se lanza el evento de Estadistica Actualizada
+      * [CONSUMER: ACTUALIZAR ESTADISTICA] El cambio en el objeto hace el update automáticamente
+         * [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.EstadisticaMateriaActualizadaEvent
+         * [UNIT OF WORK] Aquí no hay commit porque TXN counter es 2
 11. [CONSUMER: ACTUALIZAR ESTADISTICA] COMMIT
 12. [Crear Orden de Cobro] Se crea la orden de cobro a Hugo
 13. [Crear Orden de Cobro] Se lanza el evento Orden de Cobro Creada
