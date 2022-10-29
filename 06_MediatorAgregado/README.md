@@ -140,6 +140,11 @@ ejemplo.
 
 ![images/eventocompleto.png](images/eventocompleto.png)
 
+La gran ventaja de esta técnica es que en su elaboración pueden participar
+los integrantes que están encargados del negocio, no se requiere personal 
+técnico para establecer la definición de los eventos y comandos que ocurren
+en los procesos del sistema que se decide elaborar.
+
 ## Concatenación de eventos
 
 Para poder comunicar entre los diferentes métodos que debemos ejecutar la 
@@ -362,3 +367,21 @@ El resultado de la ejecución se puede ver en el siguiente detalle:
 
 Se puede ver claramente como la ejecución del código sigue tal cual el proceso
 que se había establecido en nuestro diagrama original de eventos.
+
+## Sobre el manejo de las excepciones
+
+En este ejercicio se puede configurar para indicar dónde queremos que falle la aplicación.
+Esto se define en el `Program.cs` antes de la ejecución de nuestro caso:
+
+```
+ConfiguracionCaso cfg = ConfiguracionCaso.GetOrCreate();
+
+cfg.ErrorAlRegistrarAlumno = false;
+cfg.ErrorAlActualizarEstadistica = false;
+cfg.ErrorAlCrearCobro = true;
+cfg.ErrorAlNotificarBienvenida = false;
+cfg.ErrorAlNotificarCobro = false;
+```
+
+De esta manera se puede testear que el programa falle en cualquiera de las partes y se 
+puede ver cómo el programa falla de manera coherente en cualquiera de sus partes.
