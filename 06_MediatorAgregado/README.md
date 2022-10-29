@@ -278,16 +278,15 @@ Esto tiene varias ventajas:
 * La lógica de negocios se mantiene en los métodos del dominio
 
 Una de las ventajas que se indica es la forma del método que se repite en todos 
-los handlers:
+los handlers en un patrón que se puede identificar como AEI (Arrange, Event, Interfaces):
 
-1. **Preparación** Se obtienen todos los datos que se necesitan para trabajar
-con los objetos del dominio
-2. **Lógica** Se ejecuta la lógica (de preferencia única) que este método debe
-realizar en los objetos del dominio.
-3. **Evento** Se lanza el evento para que luego se notifique.
-4. **Interfaz** Se usan las interfaces de los servicios, en este caso se usan los
-repositorios para grabar la información.
-5. **Confirmar** Se llama al commit del servicio de la base de datos.
+1. **Arrange**:
+   * **Preparación** Se obtienen todos los datos que se necesitan para trabajar con los objetos del dominio
+   * **Lógica** Se ejecuta la lógica (de preferencia única) que este método debe realizar en los objetos del dominio.
+3. **Event Enqueuing** Se lanzan los eventos y se los encola para que las interfaces externas puedan consumirlos.
+4. **Interfaces (External)** Se usan las interfaces de los servicios, en este caso se usan los
+repositorios para grabar la información y hacer el commit correspondiente, que consume los eventos para
+la comunicación entre dominios.
 
 ## Implementación de los consumidores de eventos
 
