@@ -39,17 +39,17 @@ namespace MediatorAndAggregate.UseCases.Consumers
 
             if (configuracionCaso.ErrorAlActualizarEstadistica)
             {
-                _logger.LogInformation("[ACTUALIZAR ESTADISTICA] Error al actualizar estadistica");
+                _logger.LogInformation($"[Actualizar Estadistica] Error al actualizar estadistica de {materia.Nombre}");
                 throw new ConfigCasoException("Error al actualizar estadistica");
             }
 
             materia.ActualizarEstadistica(nbRegistrados);            
-            _logger.LogInformation($"[CONSUMER: ACTUALIZAR ESTADISTICA] Se actualiza la estadistica de la materia {notification.MateriaId} con {nbRegistrados} registrados");
-            _logger.LogInformation($"[CONSUMER: ACTUALIZAR ESTADISTICA] Se lanza el evento de Estadistica Actualizada");
-            _logger.LogInformation($"[CONSUMER: ACTUALIZAR ESTADISTICA] El cambio en el objeto hace el update automáticamente");
+            _logger.LogInformation($"[Actualizar Estadistica] Se actualiza la estadistica de la materia {materia.Nombre} con {nbRegistrados} registrados");
+            _logger.LogInformation($"[Actualizar Estadistica] Se lanza el evento de Estadistica Actualizada");
+            _logger.LogInformation($"[Actualizar Estadistica] El cambio en el objeto hace el update automáticamente");
 
             await _unitOfWork.Commit();
-            _logger.LogInformation($"[CONSUMER: ACTUALIZAR ESTADISTICA] COMMIT");
+            _logger.LogInformation($"[Actualizar Estadistica] Vuelve del COMMIT");
         }
     }
 }

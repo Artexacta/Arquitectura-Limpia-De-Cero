@@ -1,4 +1,5 @@
 ﻿using MediatorAndAggregate.Events;
+using MediatorAndAggregate.Exceptions;
 using MediatorAndAggregate.Factories;
 using MediatorAndAggregate.Helpers;
 using MediatorAndAggregate.Models;
@@ -33,13 +34,20 @@ namespace MediatorAndAggregate.UseCases.Consumers
 
         public async Task Handle(AlumnoRegistradoEvent notification, CancellationToken cancellationToken)
         {
+            ConfiguracionCaso configuracionCaso = ConfiguracionCaso.GetOrCreate();
             string mensaje = Constants.MENSAJE_BIENVENIDA;
             mensaje = mensaje.Replace("{NOMBRE}", notification.NombreAlumno);
 
             Notificacion notificacion = 
                 _notificacionFactory.CrearNueva(Guid.NewGuid(), mensaje, notification.Email);
             _logger.LogInformation("[Notificar Bienvenida] Notificacion creada: {0}", notificacion.Id);
-            
+
+            if (configuracionCaso.ErrorAlNotificarBienvenida)
+            {
+                _logger.LogInformation($"[Notificar Bienvenida] Error al notificar bienvenida a {notification.NombreAlumno}");
+                throw new ConfigCasoException("Error al notificar la bienvenida");
+            }
+
             notificacion.ConsolidarCreada();
             _logger.LogInformation("[Notificar Bienvenida] Comunicar evento Notificacion Creada");
 
@@ -47,7 +55,7 @@ namespace MediatorAndAggregate.UseCases.Consumers
             _logger.LogInformation("[Notificar Bienvenida] Grabar la notificación en la base de datos");
 
             await _unitOfWork.Commit();
-            _logger.LogInformation("[Notificar Bienvenida] COMMIT");
+            _logger.LogInformation("[Notificar Bienvenida] Vuelve del COMMIT");
         }
     }
 }

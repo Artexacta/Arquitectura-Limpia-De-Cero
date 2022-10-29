@@ -19,10 +19,9 @@ namespace MediatorAndAggregate
         {
         }
 
-        public async Task PrepararAlumnos()
+        public async Task PrepararAlumnos(string[] alumnos)
         {
-            IAlumnoFactory factory = new AlumnoFactory();
-            string[] alumnos = { "Hugo", "Paco", "Luis", "Maria" };
+            IAlumnoFactory factory = new AlumnoFactory();           
 
             foreach (var alumno in alumnos)
             {
@@ -39,10 +38,9 @@ namespace MediatorAndAggregate
             }
         }
 
-        public async Task PrepararMaterias()
+        public async Task PrepararMaterias(string[] materias)
         {
             IMateriaFactory factory = new MateriaFactory();
-            string[] materias = { "Programación II","Investigación Operativa","Cálculo II", "Algoritmos" };
 
             foreach (var materia in materias)
             {

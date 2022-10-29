@@ -1,4 +1,5 @@
 ﻿using MediatorAndAggregate.Events;
+using MediatorAndAggregate.Exceptions;
 using MediatorAndAggregate.Factories;
 using MediatorAndAggregate.Helpers;
 using MediatorAndAggregate.Models;
@@ -36,6 +37,7 @@ namespace MediatorAndAggregate.UseCases.Consumers
 
         public async Task Handle(OrdenDeCobroCreadaEvent notification, CancellationToken cancellationToken)
         {
+            ConfiguracionCaso configuracionCaso = ConfiguracionCaso.GetOrCreate();
             Alumno alumno = await _alumnoRepository.FindById(notification.AlumnoId);
             string email = alumno.Nombre + "@" + Constants.DOMINIO;
             string mensaje = Constants.MENSAJE_COBRO;
@@ -46,6 +48,12 @@ namespace MediatorAndAggregate.UseCases.Consumers
                 _notificacionFactory.CrearNueva(Guid.NewGuid(), mensaje, email);
             _logger.LogInformation("[Notificar Orden de Cobro] Notificacion creada: {0}", notificacion.Id);
 
+            if (configuracionCaso.ErrorAlNotificarCobro)
+            {
+                _logger.LogInformation($"[Notificar Orden de Cobro] Error al notificar cobro a {email}");
+                throw new ConfigCasoException("Error al notificar el cobro");
+            }
+
             notificacion.ConsolidarCreada();
             _logger.LogInformation("[Notificar Orden de Cobro] Comunicar evento Notificacion Creada");
 
@@ -53,7 +61,7 @@ namespace MediatorAndAggregate.UseCases.Consumers
             _logger.LogInformation("[Notificar Orden de Cobro] Guardar en base de datos");
 
             await _unitOfWork.Commit();
-            _logger.LogInformation("[Notificar Orden de Cobro] COMMIT");
+            _logger.LogInformation("[Notificar Orden de Cobro] Vuelve del COMMIT");
         }
     }
 }

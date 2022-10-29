@@ -40,26 +40,35 @@ internal class Program
         }).BuildServiceProvider();
         
         var _mediator = provider.GetRequiredService<IMediator>();
-
-        Console.WriteLine("Hello, World!");
-
+        
         ConfiguracionCaso cfg = ConfiguracionCaso.GetOrCreate();
 
-        cfg.ErrorEnLevel0 = false;
-        cfg.ErrorEnLevel1 = false;
-        cfg.ExecuteLevel2 = true;
-        cfg.ErrorEnLevel2 = false;
+        cfg.RegistrarAlumno = "Luis";
+        cfg.EnMateria = "Algoritmos";
+        cfg.SinAgregado = false;
+        cfg.ErrorAlRegistrarAlumno = false;
+        cfg.ErrorAlActualizarEstadistica = false;
+        cfg.ErrorAlCrearCobro = true;
+        cfg.ErrorAlNotificarBienvenida = false;
+        cfg.ErrorAlNotificarCobro = false;
 
         PreparacionBaseDeDatos datos = new PreparacionBaseDeDatos(_mediator);
-        await datos.PrepararAlumnos();
-        await datos.PrepararMaterias();
+        await datos.PrepararAlumnos(cfg.Alumnos);
+        await datos.PrepararMaterias(cfg.Materias);
 
-        Alumno alumno = await _mediator.Send(new FindAlumnoByNombreQuery("Hugo"));
-        Materia materia = await _mediator.Send(new FindMateriaByNombreQuery("Algoritmos"));
+        Alumno alumno = await _mediator.Send(new FindAlumnoByNombreQuery(cfg.RegistrarAlumno));
+        Materia materia = await _mediator.Send(new FindMateriaByNombreQuery(cfg.EnMateria));
         
         try
         {
-            await _mediator.Send(new RegistrarAlumnoEnMateriaSinAgregadoCommand(alumno.Id, materia.Id));
+            if (cfg.SinAgregado)
+            {
+                await _mediator.Send(new RegistrarAlumnoEnMateriaSinAgregadoCommand(alumno.Id, materia.Id));
+            } 
+            else
+            {
+                await _mediator.Send(new RegistrarAlumnoEnMateriaCommand(alumno.Id, materia.Id));
+            }
         } catch(Exception q)
         {
             Console.WriteLine(q.Message);

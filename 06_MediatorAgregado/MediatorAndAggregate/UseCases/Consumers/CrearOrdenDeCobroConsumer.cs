@@ -1,4 +1,5 @@
 ﻿using MediatorAndAggregate.Events;
+using MediatorAndAggregate.Exceptions;
 using MediatorAndAggregate.Factories;
 using MediatorAndAggregate.Helpers;
 using MediatorAndAggregate.Models;
@@ -28,12 +29,20 @@ namespace MediatorAndAggregate.UseCases.Consumers
 
         public async Task Handle(AlumnoRegistradoEvent notification, CancellationToken cancellationToken)
         {
+            ConfiguracionCaso configuracionCaso = ConfiguracionCaso.GetOrCreate();
+            
             OrdenDeCobro orden = _ordenDeCobroFactory.CrearOrdenDeCobro(
                     Guid.NewGuid(), 
                     notification.AlumnoId, 
                     notification.MateriaId, 
                     Constants.COSTO);
             _logger.LogInformation($"[Crear Orden de Cobro] Se crea la orden de cobro a {notification.NombreAlumno}");
+
+            if (configuracionCaso.ErrorAlCrearCobro)
+            {
+                _logger.LogInformation($"[Crear Orden de Cobro] Error al crear la orden de cobro para {notification.NombreAlumno}");
+                throw new ConfigCasoException("Error al crear la orden de cobro");
+            }
 
             orden.ConsolidarCreada();
             _logger.LogInformation("[Crear Orden de Cobro] Se lanza el evento Orden de Cobro Creada");
@@ -42,7 +51,7 @@ namespace MediatorAndAggregate.UseCases.Consumers
             _logger.LogInformation("[Crear Orden de Cobro] Se guarda la orden de cobro en la base de datos");
 
             await _unitOfWork.Commit();
-            _logger.LogInformation("[Crear Orden de Cobro] COMMIT");
+            _logger.LogInformation("[Crear Orden de Cobro] Vuelve del COMMIT");
         }
     }
 }
