@@ -376,6 +376,9 @@ Esto se define en el `Program.cs` antes de la ejecución de nuestro caso:
 ```
 ConfiguracionCaso cfg = ConfiguracionCaso.GetOrCreate();
 
+cfg.RegistrarAlumno = "Luis";
+cfg.EnMateria = "Algoritmos";
+cfg.SinAgregado = false;
 cfg.ErrorAlRegistrarAlumno = false;
 cfg.ErrorAlActualizarEstadistica = false;
 cfg.ErrorAlCrearCobro = true;
@@ -385,3 +388,25 @@ cfg.ErrorAlNotificarCobro = false;
 
 De esta manera se puede testear que el programa falle en cualquiera de las partes y se 
 puede ver cómo el programa falla de manera coherente en cualquiera de sus partes.
+
+En el caso específico se solicita que la aplicación falle al medio del proceso, y tal 
+cual se espera, no ocurre ningun insert en la base de datos porque la transacción no llega 
+a completarse.
+
+* [REGISTRAR ALUMNO] Obtiene alumno y materia para poder trabajar estrictamente en dominio
+* [REGISTRAR ALUMNO] Registra alumno en materia (en dominio solamente)
+* [REGISTRAR ALUMNO] Publica el evento y lo pone en la cola
+* [REGISTRAR ALUMNO] Guarda el registro del alumno en esa materia en la base de datos
+* [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.AlumnoRegistradoEvent
+    * [Actualizar Estadistica] Se actualiza la estadistica de la materia Algoritmos con 1 registrados
+    * [Actualizar Estadistica] Se lanza el evento de Estadistica Actualizada
+    * [Actualizar Estadistica] El cambio en el objeto hace el update automáticamente
+    * [UNIT OF WORK] Se notifica el evento MediatorAndAggregate.Events.EstadisticaMateriaActualizadaEvent
+    * [UNIT OF WORK] Aquí no hay commit porque TXN counter es 2
+    * [Actualizar Estadistica] Vuelve del COMMIT
+    * [Crear Orden de Cobro] Se crea la orden de cobro a Luis
+    * [Crear Orden de Cobro] Error al crear la orden de cobro para Luis
+* **Error al crear la orden de cobro**
+
+Problemente no sea mala idea limpiar todas las transacciones pendientes que no se van 
+a completar pero debemos indagar un poco mejor el manejo de EF en esos casos.
