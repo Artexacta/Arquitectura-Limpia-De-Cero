@@ -116,3 +116,62 @@ var app = builder.Build();
 	* Singleton: Solamente se crea una vez y se reutiliza siempre el mismo
 	* Transient: Se crea cada vez que se lo necesita, si en un mismo Request se lo necesita 3 veces, se crea 3 veces el objeto
 
+## Configuración de la aplicación con appsettings
+
+En el archivo appsettings se pueden colocar variables que servirán
+para configurar la aplicación al momento de la ejecución. Se puede ver un
+ejemplo sencillo aquí
+
+```
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "NombreAplicacion": "Primero"
+}
+```
+En este caso podemos ver que tenemos una variable que utilizamos para saber el 
+nombre de la aplicación que queremos utilizar en la vista de nuestra aplicación.
+
+Para poder utilizar este valor en nuestro controlador solamente debemos 
+inyectar el IConfiguration para que la implementación por defecto de ASP.NET
+busque en el archivo appsettings por defecto. 
+
+Finalmente, es importante indicar que el appsettings que se usa al momento 
+de la ejecución es el resultado de construir de manera escalonada de acuerdo al
+siguiente orden:
+
+* Primero se toma el appsettings que está en la aplicación
+* La aplicación se puede ejecutar en ambiente de desarrollo o de producción. Si
+existe, se aplica el appsettings del ambiente de ejecución.
+* Finalmente, si existe, se aplica el User Secrets del usuario que ejecuta la aplicación.
+
+18. Inyectar el IConfiguration en nuestro controlador para que se pueda utilizar
+la configuración.
+
+```
+private readonly IConfiguration _configuration;
+
+public HomeController(ILogger<HomeController> logger,
+	IReversaString reversaString,
+	IConfiguration configuration)
+{
+	_logger = logger;
+	_reversaString = reversaString;
+	_configuration = configuration;
+}
+```
+
+19. Utilizar el objeto configuration para obtener la información que está en el
+appsettings.
+```
+string nombreAplicacion = "Primero";
+if (!string.IsNullOrWhiteSpace(_configuration.GetValue<string>("NombreAplicacion")))
+{
+	nombreAplicacion = _configuration.GetValue<string>("NombreAplicacion");
+}
+```
