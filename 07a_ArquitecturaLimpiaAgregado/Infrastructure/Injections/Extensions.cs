@@ -20,14 +20,13 @@ namespace Infrastructure.Injections
         public static IServiceCollection AddInfrastructure(this IServiceCollection services,
             IConfiguration configuration)
         {
-            string connectionString =
-            configuration.GetConnectionString("DBConnectionString");
-
             services.AddDbContext<WriteDbContext>(context =>
-                context.UseSqlServer(connectionString, b => b.MigrationsAssembly("Infrastructure")));
+                context.UseSqlServer(configuration.GetConnectionString("WriteConnectionString"), 
+                    b => b.MigrationsAssembly("Infrastructure")));
             
             services.AddDbContext<ReadDbContext>(options =>
-                options.UseSqlServer(connectionString, b => b.MigrationsAssembly("Infrastructure")));
+                options.UseSqlServer(configuration.GetConnectionString("ReadConnectionString"), 
+                    b => b.MigrationsAssembly("Infrastructure")));
             
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 

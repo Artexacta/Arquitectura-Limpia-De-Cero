@@ -9,7 +9,7 @@ namespace Domain.Models
         public string Nombre { get; private set; }
         public int Cupo { get; set; }
         public int CantidadAlumnos { get; private set; }
-        public List<Registrado> Registrados { get; set; }
+        private readonly List<Registrado> Registrados;
 
         public Materia(Guid id, string nombre, int cupo)
         {

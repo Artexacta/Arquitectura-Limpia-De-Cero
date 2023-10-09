@@ -8,7 +8,6 @@ namespace Infrastructure.EF.Configurations.Write
     {
         public void Configure(EntityTypeBuilder<Materia> builder)
         {
-            builder.Ignore(x => x.Registrados);
             builder.Ignore(x => x.DomainEvents);            
             builder.Property(x => x.Nombre).HasMaxLength(200);
         }

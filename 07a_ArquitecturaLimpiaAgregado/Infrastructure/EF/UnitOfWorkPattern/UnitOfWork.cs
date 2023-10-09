@@ -48,6 +48,7 @@ namespace Infrastructure.UnitOfWorkPattern
             {
                 _logger.LogInformation("[UNIT OF WORK] Se hace el commit de todos los cambios");
                 await this._context.SaveChangesAsync();
+                _transactionCounter--;
             } 
             else
             {
