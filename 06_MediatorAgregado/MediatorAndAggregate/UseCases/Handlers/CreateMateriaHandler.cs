@@ -24,11 +24,8 @@ namespace MediatorAndAggregate.UseCases.Handlers
         public async Task<bool> Handle(CreateMateriaCommand request, CancellationToken cancellationToken)
         {
             Materia obj = _factory.CrearNueva(request.MateriaACrear);
-
-            obj.ConsolidarCreada();
-            
-            await _materiaRepository.CreateAsync(obj);
-            
+            obj.ConsolidarCreada();            
+            await _materiaRepository.CreateAsync(obj);            
             await _unitOfWork.Commit();
             return true;
         }

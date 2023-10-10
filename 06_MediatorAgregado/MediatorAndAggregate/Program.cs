@@ -48,7 +48,7 @@ internal class Program
         cfg.SinAgregado = false;
         cfg.ErrorAlRegistrarAlumno = false;
         cfg.ErrorAlActualizarEstadistica = false;
-        cfg.ErrorAlCrearCobro = true;
+        cfg.ErrorAlCrearCobro = false;
         cfg.ErrorAlNotificarBienvenida = false;
         cfg.ErrorAlNotificarCobro = false;
 

@@ -4,11 +4,6 @@ using MediatorAndAggregate.Repositories;
 using MediatorAndAggregate.UnitOfWorkPattern;
 using MediatorAndAggregate.UseCases.Commands;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MediatorAndAggregate.UseCases.Handlers
 {
@@ -29,11 +24,8 @@ namespace MediatorAndAggregate.UseCases.Handlers
         public async Task<bool> Handle(CreateAlumnoCommand request, CancellationToken cancellationToken)
         {
             Alumno obj = _factory.CrearNuevo(request.AlumnoACrear);
-
-            obj.ConsolidarCreado();
-            
-            await _alumnoRepository.CreateAsync(obj);
-            
+            obj.ConsolidarCreado();            
+            await _alumnoRepository.CreateAsync(obj);            
             await _unitOfWork.Commit();
             return true;
         }
