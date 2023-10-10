@@ -1,6 +1,4 @@
-﻿using ShareKernel.Core;
-
-namespace SharedKernel.Core
+﻿namespace SharedKernel.Core
 {
     public abstract class Entity<TId>
     {

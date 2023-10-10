@@ -1,361 +1,260 @@
-# Patrón Agregado Raíz
+# Arquitectura Limpia, Mediator, CQRS y Agregado
 
-## Objetivo del ejercicio
+En este proyecto se trata de replicar lo mismo que teniamos en el 
+anterior ejercicio pero ya dentro del marco de un proyecto completo
+de Arquitectura limpia con todos los proyectos separados y aplicando
+los patrones de diseño que se ha visto en todos los proyectos
+anteriores.
 
-El objetivo de este ejercicio es el de poder implementar el patrón
-de diseño aggregate root para que nuestra solución sea basada en eventos
-y siga más naturalmente la arquitectura limpia.
+Veremos a continuación cada uno de los pasos necesarios para poder
+replicar el proyecto.
 
-La solución tendrá dos funcionalidades. 
-* Una será la de siempre que consiste en tener un ABM de Producto.
-* Y luego tendremos una manera de ingresar un pedido; donde, en una transacción
-se creará el maestro del pedido, todos los registros detalle y una actualización
-al stock de los productos que intervienen en el pedido.
+## Crear proyectos
 
-Se necesita mostrar cómo se separa la lógica de negocios y cómo se comunican
-de los diferentes eventos entre los agregados raíz y las entidades.
+1. Lo primero es crear el proyecto web con la plantilla de proyecto
+Aplicación ASP.NET Core Web API. Esto nos permitirá tener una API así
+como una página web.
 
-## Otro uso del mediator: Publish
+2. Crear el proyecto de librería de clases para Domain.
 
-Mediator permite dos tipos de mensajes:
+3. Crear el proyecto de librería de clases para SharedKernel.
 
-* Send: enviando un Request a un Handler, siempre devuelve algo
-* Publish: notifica de un Evento a todos los handlers que sepan manejarlo, no 
-devuelve nada
+4. Crear el proyecto de librería de clases para Infrastructure.
 
-Cuando creamos un pedido, tenemos la complejidad que tenemos que actualizar el
-stock de todos y cada uno de los ítems que conforman el pedido. La creación de
-un pedido difiere de actualizar el stock, y sin embargo, deben ocurrir en la
-misma lógica de negocios.
+5. Crear el proyecto de librería de clases para Application.
 
-La propuesta es separar esto por eventos. Crear el pedido y notificar que el 
-pedido ha sido creado. Existirá un controlador para los ítems del pedido para 
-poderlos crear y validar contra los productos y también existirá un controlador
-para actualizar el inventario (stock) de los productos afectados por el pedido.
+## Proyecto SharedKernel 
+En este proyecto básicamente se coloca todo lo necesario para poder
+realizar el patrón Raiz Agregado tal cual como lo vimos en el anterior
+proyecto. Posteriormente, en este proyecto, se puede colocar las cosas
+en comun para poder hacer las:
 
-En este caso, como elegimos la opción de publicar eventos utilizaremos la
-función de Publish del mediator.
+* Validaciones de los objetos del dominio
+* Los Objetos Valor (Value Objects) de los objetos del dominio
 
-### Eventos de dominio
+1. Crear las clases AggregateRoot, DomainEvent y Entity. Estos son los 
+mismos del anterior proyecto, solamente se cambio el espacio de nombres
+de las clases para que sea igual que el proyecto.
 
-Estos son los eventos que publicaremos al mediator. Cada evento dentro de la 
-aplicación será subclase de nuestro evento del dominio. Este evento del
-dominio deberá implementar INotification.
+## Proyecto Domain
+Básicamente en este proyecto replicaremos todo lo del funcionamiento y
+logica de negocios del anterior proyecto.
 
-## Patrón Agregado Raíz (Aggregate Root)
+Todo lo realizado en este proyecto es para tener toda la funcionalidad de
+alta, baja y modificación de la aplicación. No se programa nada que se 
+utilice para leer datos. Toda la lectura se realizará en otro lugar con 
+otras clases.
 
-La mejor explicación es la que da el creador de este patrón Martin Fowler.
+1. Creamos las excepciones replicando el proyecto anterior en una carpeta
+Exceptions.
 
-Agregado es un patrón del paradigma DDD. Un agregado DDD 
-es un grupo de objetos de dominio que se pueden tratar como una sola unidad. 
-Un ejemplo puede ser un pedido y sus elementos de línea, estos serán objetos 
-separados, pero es útil tratar el pedido (junto con sus elementos de línea) 
-como un solo agregado.
+2. Creamos los eventos replicando el proyecto anterior en una carpeta Events.
 
-Un agregado tendrá uno de sus objetos componentes como la raíz del agregado. 
-Cualquier referencia desde fuera del agregado solo debe ir a la raíz del 
-agregado. La raíz puede así asegurar la integridad del agregado como un todo.
+3. Crear los modelos replicando el proyecto anterior en una carpeta Models.
 
-Para implementar este patrón, vamos a usar dos clases: la clase AggregateRoot
-y la clase Entity. Una entidad son los objetos de dominio que forman parte
-del agregado pero no son raíz.
+4. Crear las factorias replicando el proyecto anterior en una carpeta Factories.
 
-Una entidad tiene:
-* Una lista de eventos que llegan al agregado
-* Un identificador único (usaremos un Guid)
+5. Crear el archivo con las constantes que se usan en el dominio.
 
+6. Crear la extensión para definir las dependencias del proyecto. Basicamente
+para inyectar las factorías de los objetos del dominio.
 
+7. Colocar en el proyecto web la dependencia 
 
-1. Crear una aplicación web como en el anterior ejercicio.
-
-2. Adicional la libreria de cliente font-awesome y asegurarse de llamarla en el Layout.
-
-3. Crear el proyecto de librería Domain.
-
-4. Crear el proyecto de librería Infrastructure
-
-5. Crear el proyecto de librería Application
-
-6. Crear el objeto del dominio Producto, solamente con 3 campos: Nombre, Stock y Precio.
-No colocar Id todavía.
-
-7. Crear el objeto de dominio PedidoItem que tiene los campos: PedidoId, ProductoId,
-Cantidad, PrecioUnitario. El Total también se encuentra en esta clase pero es calculado
-a partir de los datos. No colocar el Id todavía.
-
-8. Crear el objeto del dominio Pedido. Solamente necesita los campos: Fecha, 
-NombreCliente, Descuento. También se debe colocar Subtotal y Total pero ambos dependen
-de los ítems que tenga el pedido. No colocar el Id todavía.
-
-## Implementando Aggregate Root
-Para ir implementando este patrón necesitaremos un proyecto que llamaremos SharedKernel.
-Este proyecto tiene todo lo necesario para que los objetos del dominio puedan heredar
-el funcionamiento que queremos para poder implementar el patrón.
-
-9. Crear el proyecto SharedKernel
-
-10. Colocar el nuget Mediatr Contracts
-
-11. Crear la clase DomainEvent. Solamente se necesita colocar como atributos el 
-momento en que el evento pasó y el id del mismo. Esto en la carpeta Core
-
-12. Crear la clase Entity tal cual la describimos en la explicación del patrón
-Agreagado Raíz.
-```
-public abstract class Entity<TId>
-{
-	public TId Id { get; protected set; }
-	private readonly ICollection<DomainEvent> _domainEvents;
-
-	public ICollection<DomainEvent> DomainEvents { get { return _domainEvents; } }
-
-	protected Entity()
-	{
-		_domainEvents = new List<DomainEvent>();
-	}
-
-	public void AddDomainEvent(DomainEvent evento)
-	{
-		_domainEvents.Add(evento);
-	}
-
-	public void ClearDomainEvents()
-	{
-		_domainEvents.Clear();
-	}
-}
+```c#
+builder.Services.AddDomainDependencies();
 ```
 
-13. Crear la clase AggregateRoot que solamente hace de subclase de Entity y nada más.
-```
-public abstract class AggregateRoot<TId> : Entity<TId>
-{
-}
+8. Copiar las interfases que se crearon en el anterior proyecto para los repositorios. 
+Acomodar los espacios de nombre.
+
+## Proyecto Infrastructure
+En este proyecto comenzamos a aplicar algunos de los patrones que forman la parte 
+esencial de la arquitectura limpia. Probablemente el más importante es el de CQRS.
+
+En el proyecto 5 se vio la implementación de CQRS con dos DbContext. Hacemos lo
+mismo ahora en el proyecto de Infrastructure.
+
+### Migrations
+
+Los migrations se hacen con el DbContext de lectura así que tenemos que tener todo 
+bien definido en ese contexto. El contexto de escritura solamente tiene referencia
+a la estructura del objeto simple.
+
+Esto hace que al escribir los datos de un objeto, no se bloquean más registros que los
+absolutamente necesarios. Es decir, solamente la tupla en cuestión.
+
+## Contextos DB
+
+1. Creamos la clase WriteDbContext en la carpeta Contexts del proyecto.
+
+2. El metodo OnModelCreating tiene la referencia a los EntityTypeConfigurations de la
+carpeta Write de Configurations en el mismo proyecto.
+```c#
+var alumnoConfig = new AlumnoWriteEntityConfiguration();
+modelBuilder.ApplyConfiguration<Alumno>(alumnoConfig);
 ```
 
-14. Crear la interfaz IRepository en la carpeta Core y colocar los dos métodos que
-siempre estarán en todos los objetos de dominio que tienen escritura.
-```
-public interface IRepository<T,in Tid> where T : AggregateRoot<Tid>
-{
-	Task<T> FindById(Tid id);
-	Task CreateAsync(T obj);
-}
-```
-15. El objeto del dominio Producto es un agregado raíz. Indicarlo explícitamente en
-la clase. Esto hace que el objeto herede el Id. Esto hace que el proyecto Domain
-dependa del objeto SharedKernel.
-```
-public class Producto : AggregateRoot<Guid>
-{
-	public string Nombre { get; set; }
-	public int Stock { get; set; }
-	public decimal Precio { get; set; }
-	
-	public Producto()
-	{
-		Nombre = "";
-		Stock = 0;
-		Precio = 0;
-	}
-}
-```
-16. El objeto del dominio Pedido es un agregado raíz. Indicarlo explícitamente en
-la clase. Esto hace que el objeto herede el Id.
-```
-public class Pedido : AggregateRoot<Guid>
-{
-	public String NombreCliente { get; set; }
-	public decimal Descuento { get; set; }
-	public DateTime Fecha { get; set; }
-	public List<PedidoItem> Detalles { get; set; }
-	...
-}
-```
-17. El objeto del dominio PedidoItem es una entidad. Indicarlo explícitamente en
-la clase. Esto hace que el objeto herede el Id.
-```
-public class PedidoItem : Entity<Guid>
-{
-	public Guid PedidoId { get; set; }
-	public Guid ProductoId { get; set; }
-	public int Cantidad { get; set; }
-	public decimal PrecioUnitario { get; set; }
-	public decimal Total
-	{
-		get { return Cantidad * PrecioUnitario; }
-	}
-}
-```
-
-## Crear lo necesario para ejecutar el Migrations
-
-18. Crear el DTO para Productos. Esto se hace en el proyecto Application.
-
-19. Crear el DTO para Pedidos. Esto se hace en el proyecto Application.
-
-20. Crear el DTO para PedidoItems. Esto se hace en el proyecto Application.
-
-21. Crear el contexto de lectura como en el anterior programa. Esta vez tomar en
-cuenta que se tienen 3 conjuntos: Pedidos, PedidoItems y Productos.
-
-22. Crear el context de escritura como en el anterior programa. Esta vez tomar en
-cuenta que se tienen 3 conjuntos: Pedidos, PedidoItems y Productos.
-
-23. Instalar el EntityFrameworkCore SqlServer para que puedan funcionar las llamadas
-específicas al momento de la creación de tablas y atributos.
-
-24. Crear el Entity Configuration de producto, pedido y pedidoItem para la lectura. 
-En esta clase se coloca el 
-detalle de cómo se va a implementar la tabla en la base de datos. Este contexto
-es el que se utiliza para los update database.
-
-En el caso de que los objetos tengan atributos tipo enum entonces se debe hacer 
-la siguiente conversión para que EF sepa cómo transformarlo:
-```
-builder.Property(e => e.Estado)
-	.HasConversion(
-		v => v.ToString(),
-		v => (EstadoPedido)Enum.Parse(typeof(EstadoPedido), v))
-	.HasMaxLength(50);
-```
-
-25. Crear el Entity Configuration de producto, pedido y pedidoItem para la escritura.
-En esta clase solamente es necesario colocar el tema de la llave (id) de cada una 
-de las tablas.
-
-Para la lectura no olvidar de indicar expresamente que se debe Ignorar el atributo
-DomainEvents que viene heredado de Entity.
-```
+3. En los configurations se debe colocar que se va a ignorar los atributos de DomainEvents
+para que estos no aparezcan en la base de datos.
+```c#
 builder.Ignore(x => x.DomainEvents);
 ```
 
-26. Colocar la configuración del string de conexión para la aplicación.
+4. Creamos la clase ReadDbContext en la carpeta Contexts del proyecto
 
-27. Crear la clase de implementación del patrón Unit of Work.
+5. Creamos las configuraciones en la carpeta Read copiando de la carpeta Write.
 
-28. Asegurarse de tener la inyección de dependencias para que podamos ejecutar la
-aplicación para que se pueda utilizar el update-database para revisar que 
-el proyecto está correcto hasta ahora. Aquí no hay todavía nada específico, es 
-solamente para que podamos utlizar el migrations.
+6. Copiamos el mismo codigo de WriteDbContext en ReadDbContext. Solamente debemos cambiar Write
+por Read o aumentar ReadModel donde haga falta.
+```c#
+var alumnoConfig = new AlumnoReadEntityConfiguration();
+modelBuilder.ApplyConfiguration<AlumnoReadModel>(alumnoConfig);            
 ```
-public static class Extensions
+
+Es importante que al momento de probar si es que los DbContext estan funcionando que la aplicación
+Web tenga el paquete de Entity Framework Core Design y que la base de datos esté creada.
+Para poder crear las tablas como siempre solamente utilizar la consola y ejecutar:
+```
+add-migration v1 -Context ReadDbContext
+update-database -Context ReadDbContext
+```
+
+Las tablas deberían quedar de la siguiente manera:
+![tablas](images/tablas.png "Tablas de la base de datos")
+
+### Repository
+
+Aplicamos el patrón Repository para que podamos utilizar estas consultas para nuestros handlers
+que se encarguen de los ABM (CRUD).
+
+7. Solamente copiar la implementación de los repositorios tal cual como se los tenía en el 
+anterior proyecto.
+
+8. Copiar la clase de implementación del patrón UnitOfWork.
+
+9. En la inyección de dependencias asegurarse que se está haciendo el enlace a todas las 
+interfases. Aquí el ejemplo de cómo queda:
+```c#
+public static IServiceCollection AddInfrastructure(this IServiceCollection services,
+            IConfiguration configuration)
 {
-	public static IServiceCollection AddInfrastructure(this IServiceCollection services,
-		IConfiguration configuration)
+	string connectionString =
+	configuration.GetConnectionString("DBConnectionString");
+
+	services.AddDbContext<ReadDbContext>(options =>
+		options.UseSqlServer(connectionString, b => b.MigrationsAssembly("Infrastructure")));
+
+	services.AddDbContext<WriteDbContext>(context =>
+		context.UseSqlServer(connectionString, b => b.MigrationsAssembly("Infrastructure")));
+
+	services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+	services.AddScoped<IAlumnoRepository, AlumnoRepository>();
+	services.AddScoped<IMateriaRepository, MateriaRepository>();
+	services.AddScoped<INotificacionRepository, NotificacionRepository>();
+	services.AddScoped<IOrdenDeCobroRepository, OrdenDeCobroRepository>();
+
+	return services;
+}
+```
+
+## Proyecto Application
+
+En este proyecto vamos a colocar principalmente los casos de uso y toda la parte para poder
+obtener los datos del contexto de lectura. En este proyecto programamos el patrón MVVM. Entonces,
+del contexto obtenemos los ReadModel y en el handler convertimos estos ReadModel a ViewModels.
+
+1. Crear los ViewModels que son copia fiel del ReadModel. 
+
+2. Crear los ViewModels de tipo lista para conjuntos de objetos. Esto solamente es necesario
+si se necesita alguna operación especial en una lista de objetos.
+
+3. Crear los profiles que convierten de los ReadModel a los ViewModel.
+
+### Mediator
+
+Ahora podemos comenzar a crear los casos de uso tal cual los teniamos en el anterior proyecto.
+Vamos a completar en este proyecto los casos de uso con los de lectura para que podamos ver la
+información que se vaya guardando en la base de datos.
+
+4. Copiar todos los archivos correspondientes a los comandos del anterior proyecto y cambiar
+los espacios de nombre.
+
+5. En los casos de uso se necesita cambiar el uso de objetos por objetos de tipo ReadModel cuando
+la acción es de lectura. Y convertir estos objetos de tipo ReadModel al ViewModel correspondiente
+para ocultar los campos que no necesitamos que la interfaz u otro conozcan
+```c#
+public class FindRegistradosEnMateriaHandler : 
+	IRequestHandler<FindRegistradosEnMateriaQuery, List<RegistradoViewModel>>
+{
+	private readonly DbSet<RegistradoReadModel> Registrados;
+	private readonly IMapper _mapper;
+	public FindRegistradosEnMateriaHandler(ReadDbContext context, IMapper mapper)
 	{
-		var connectionString =
-			configuration.GetConnectionString("DBConnectionString");
+		Registrados = context.Registrados;
+		_mapper = mapper;
+	}
+	public async Task<List<RegistradoViewModel>> Handle(
+		FindRegistradosEnMateriaQuery request, CancellationToken cancellationToken)
+	{
+		List<RegistradoReadModel> registrados = await Registrados.AsNoTracking()
+				.Where(x => x.MateriaId == request.MateriaId).ToListAsync();
 
-		services.AddDbContext<WriteDbContext>(context =>
-			context.UseSqlServer(connectionString));
-		services.AddDbContext<ReadDbContext>(context =>
-			context.UseSqlServer(connectionString));
+		List<RegistradoViewModel> model = new List<RegistradoViewModel>();
+		foreach(RegistradoReadModel obj in registrados)
+		{
+			model.Add(_mapper.Map<RegistradoViewModel>(obj));
+		}
 
-		services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-		return services;
+		return model;
 	}
 }
 ```
-29. Añadir la referencia a la inyección de dependencias de Infrasatructure desde el
-Program de la aplicación principal. Para esto deberá hacer que el proyecto
-de presentación haga referencia al proyecto Infrastructure.
+En este código se puede ver claramente el uso del mapper para poder crear objetos de tipo ViewModel
+que son accesibles desde el mediator. El controlador hará uso de estos handler sin pasar por 
+objetos de tipo ReadModel; esto para evitar que el controlador tenga acceso a atributos que no 
+necesita.
 
-30. Realizar los comandos necesarios para crear el migration y luego ejecutar 
-el migrations creado. No olvidarse que para que reconozca los comandos debemos
-tener el nuget de tools de entityframework.
-
-## Crear los Repositorios
-
-31. Inspirados en el anterior proyecto crear el repositorio para los productos,
-pedidos y pedidoItem. tomar en cuenta que ahora el IRepository viene del proyecto
-de SharedKernel.
-
-No se hacen repositorios para objetos del dominio que no son agregados y se colocan
-en estos repositorios todos los métodos que se necesiten para guardar y actualizar
-las entidades de este agregado raíz.
-
-32. Colocar la inyección de dependencias en el archivo Extensions.
-
-## Crear los DTOs para la lectura
-
-33. Crear las clases DTO con los campos de solamente lectura que necesitarán 
-las interfaces del sistema.
-
-## Casos de uso de escritura y agregados raíz
-
-Al momento de realizar los casos de uso para el agregado de pedidos es que 
-comienza realmente la programación orientada a eventos. Aquí comenzamos a pensar 
-los eventos que vamos a necesitar para el agregado de pedidos.
-* Crear pedido:  solamente se crea el pedido con una fecha y el estado pendiente
-* Actualizar pedido: Se actualizan los datos de descuento y nombre de cliente
-* Agregar ítem a pedido: Agrega un ítem al pedido revisando primero si hay 
-stock suficiente (pero no reserva stock).
-* Quitar ítem de pedido: Quita un ítem del pedido 
-* Actualizar cantidad de un ítem: Actualiza la cantidad del pedido
-* Confirmar pedido: Este es el método complejo que da lugar a la comunicación entre
-agregados. Se cambia el estado del pedido y se cambia el stock de los productos.
-* Anular pedido: Este también es un método complejo ya que implica revertir la 
-operación anterior y por ende corregir el stock que hay en cada producto que 
-interviene en el pedido.
-
-34. Instalar el package Mediatr en Application
-
-35. Copiar tal cual los comandos y controladores de los casos de uso de los productos.
-
-36. Crear los comandos para el agregado de Pedidos de acuerdo a la descripción anterior
-
-37. Agregar los factories. Y colocarlos en application para que la inyección los vea.
-Esto se hace como transient.
-
-38. Crear el evento que se debe comunicar entre agregados para que otras entidades
-puedan realizar las tareas que corresponden para ese evento en particular
-```
-public record CreatedPedidoPendiente : DomainEvent
+Aquí tenemos otro ejemplo:
+```c#
+public class FindAlumnoByNombreHandler : 
+	IRequestHandler<FindAlumnoByNombreQuery, List<AlumnoViewModel>>
 {
-	public Guid Id { get; set; }
-
-	public CreatedPedidoPendiente(Guid id) : base(DateTime.UtcNow)
+	private readonly DbSet<AlumnoReadModel> Alumnos;
+	private readonly IMapper _mapper;
+	public FindAlumnoByNombreHandler(ReadDbContext context, IMapper mapper)
 	{
-		Id = id;
+		Alumnos = context.Alumnos;
+		_mapper = mapper;
+	}
+	public async Task<List<AlumnoViewModel>> Handle(
+		FindAlumnoByNombreQuery request, CancellationToken cancellationToken)
+	{
+		List<AlumnoReadModel> alumnos =
+			await Alumnos.AsNoTracking()
+				.Where(x => x.Nombre.Contains(request.Nombre))
+				.Take(request.Cantidad)
+				.ToListAsync();
+
+		List<AlumnoViewModel> resultado = new List<AlumnoViewModel>();
+
+		foreach(AlumnoReadModel alumno in alumnos)
+		{
+			resultado.Add(_mapper.Map<AlumnoViewModel>(alumno));
+		}
+		
+		return resultado;
 	}
 }
 ```
-Estos eventos son creados como records y son destinados a solamente tener los valores
-con los cuales son creados, sobre todo el atributo que tiene que ver con el momento
-en el cual son creados.
+6. En la inyección de dependencias no olvidarse de añadir la referencia a AutoMapper para que
+pueda leer todas las clases que extienden Profile.
 
-38. El controlador de crear pedido tiene la siguiente forma:
-```
-public async Task<Guid> Handle(CreatePedidoCommand request, CancellationToken cancellationToken)
-{
-	Pedido nuevoPedido = _pedidoFactory.CreatePedido();
-	await _pedidoRepository.CreateAsync(nuevoPedido);
-	await _unitOfWork.Commit();
-	return nuevoPedido.Id;
-}
-```
-Y la magia comeinza a operar cuando se hace el commit del unit of work.
+## Proyecto Web
 
-39. Desempilar todos los eventos que se han quedado en las entidades y publicarlos. 
-Al utilizar el publish del mediator se está implementando un patrón muy parecido al observer 
-que hace que se ejecuten todas las cosas que queremos que se ejecuten una vez que los
-eventos ocurran.
-```
-public async Task Commit()
-{
-	// Publicar eventos del dominio
-	var domainEvents = _context.ChangeTracker.Entries<Entity<Guid>>()
-		.Select(x => x.Entity.DomainEvents)
-		.SelectMany(x => x)
-		.ToArray();
+El proyecto web se debe crear como siempr lo hacemos con la plantilla correspondiente.
 
-	foreach (var domainEvent in domainEvents)
-	{
-		await _mediator.Publish(domainEvent);
-	}
-	
-	await this._context.SaveChangesAsync();
-}
-```
+1. Hacer el llamado a la inyección de dependencias de los proyectos.
+
+

@@ -1,0 +1,139 @@
+﻿@using Application.Dtos
+@model Application.Dtos.HomeDto
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Bienvenido</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Alumnos Registrados</h2>
+            <p>
+                Existen @Model.Alumnos.Count alumnos
+            </p>
+            @if (Model.Alumnos.Count > 0) {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(AlumnoDto alumno in Model.Alumnos) {
+                            <tr>
+                                <td>
+                                    @alumno.Nombre
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+        <div class="col-md-6">
+            <h2>Materias</h2>
+            <p>
+                Existen @Model.Materias.Count materias
+            </p>
+            @if (Model.Materias.Count > 0)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Materia</th>
+                            <th>Registrados</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (MateriaDto materia in Model.Materias)
+                        {
+                            <tr>
+                                <td>@materia.Nombre</td>
+                                <td>
+                                    @foreach (var registrado in materia.AlumnosRegistrados)
+                                    {
+                                        <p>
+                                            @registrado.Nombre
+                                        </p>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+    <!-- Ordenes de cobro y nontificaciones -->
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Notificaciones</h2>
+            <p>
+                Existen @Model.Notificaciones.Count notificaciones
+            </p>
+            @if (Model.Notificaciones.Count > 0)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Mensaje</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (NotificacionDto notificacion in Model.Notificaciones)
+                        {
+                            <tr>
+                                <td>
+                                    @notificacion.Creado
+                                </td>
+                                <td>
+                                    @notificacion.Mensaje
+                                </td>
+                                <td>
+                                    @notificacion.Email
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+        <div class="col-md-6">
+            <h2>Ordenes de Cobro</h2>
+            <p>
+                Existen @Model.OrdenesDeCobro.Count ordenes de cobro
+            </p>
+            @if (Model.OrdenesDeCobro.Count > 0)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Materia</th>
+                            <th>Alumno</th>
+                            <th>Fecha</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (OrdenDeCobroDto ordenDeCobro in Model.OrdenesDeCobro)
+                        {
+                            <tr>
+                                <td>@ordenDeCobro.Materia.Nombre</td>
+                                <td>@ordenDeCobro.Alumno.Nombre</td>
+                                <td>
+                                    @ordenDeCobro.Fecha
+                                </td>
+                                <td>
+                                    @ordenDeCobro.Monto
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>

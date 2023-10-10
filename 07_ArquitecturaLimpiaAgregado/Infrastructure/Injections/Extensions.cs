@@ -1,13 +1,17 @@
-﻿using Domain.Repositories.Pedidos;
-using Domain.Repositories.Productos;
-using Domain.UnitOfWorkPattern;
-using Infrastructure.Contexts;
-using Infrastructure.Repositories.Pedidos;
-using Infrastructure.Repositories.Productos;
+﻿using Domain.Factories;
+using Domain.Repositories;
+using Infrastructure.EF.DbContexts;
+using Infrastructure.Repositories;
 using Infrastructure.UnitOfWorkPattern;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SharedKernel.Repository;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Injections
 {
@@ -16,17 +20,20 @@ namespace Infrastructure.Injections
         public static IServiceCollection AddInfrastructure(this IServiceCollection services,
             IConfiguration configuration)
         {
-            var connectionString =
-                configuration.GetConnectionString("DBConnectionString");
-
             services.AddDbContext<WriteDbContext>(context =>
-                context.UseSqlServer(connectionString));
-            services.AddDbContext<ReadDbContext>(context =>
-                context.UseSqlServer(connectionString));
-
-            services.AddScoped<IProductoRepository, ProductoRepository>();
-            services.AddScoped<IPedidoRepository, PedidoRepository>();
+                context.UseSqlServer(configuration.GetConnectionString("WriteConnectionString"), 
+                    b => b.MigrationsAssembly("Infrastructure")));
+            
+            services.AddDbContext<ReadDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("ReadConnectionString"), 
+                    b => b.MigrationsAssembly("Infrastructure")));
+            
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            services.AddScoped<IAlumnoRepository, AlumnoRepository>();
+            services.AddScoped<IMateriaRepository, MateriaRepository>();
+            services.AddScoped<INotificacionRepository, NotificacionRepository>();
+            services.AddScoped<IOrdenDeCobroRepository, OrdenDeCobroRepository>();
 
             return services;
         }
