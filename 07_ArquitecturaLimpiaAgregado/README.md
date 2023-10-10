@@ -165,12 +165,15 @@ En este proyecto vamos a colocar principalmente los casos de uso y toda la parte
 obtener los datos del contexto de lectura. En este proyecto programamos el patrón MVVM. Entonces,
 del contexto obtenemos los ReadModel y en el handler convertimos estos ReadModel a ViewModels.
 
-1. Crear los ViewModels que son copia fiel del ReadModel. 
+1. Crear los Dtos que son las vistas modelo que son copia fiel del ReadModel. 
 
-2. Crear los ViewModels de tipo lista para conjuntos de objetos. Esto solamente es necesario
-si se necesita alguna operación especial en una lista de objetos.
-
-3. Crear los profiles que convierten de los ReadModel a los ViewModel.
+2. Crear los profiles que convierten de los ReadModel a los Dto. En estos profile deben ir 1 o 2
+mapeos:
+   * ReadModel a Dto
+   * Model a Dto
+   
+ReadModel es el que se ha creado en Infrastructure y el Model es el objeto del dominio
+que se ha creado en el proyecto Domain.
 
 ### Mediator
 
@@ -178,15 +181,15 @@ Ahora podemos comenzar a crear los casos de uso tal cual los teniamos en el ante
 Vamos a completar en este proyecto los casos de uso con los de lectura para que podamos ver la
 información que se vaya guardando en la base de datos.
 
-4. Copiar todos los archivos correspondientes a los comandos del anterior proyecto y cambiar
+3. Copiar todos los archivos correspondientes a los comandos del anterior proyecto y cambiar
 los espacios de nombre.
 
-5. En los casos de uso se necesita cambiar el uso de objetos por objetos de tipo ReadModel cuando
-la acción es de lectura. Y convertir estos objetos de tipo ReadModel al ViewModel correspondiente
+4. En los casos de uso se necesita cambiar el uso de objetos por objetos de tipo ReadModel cuando
+la acción es de lectura. Y convertir estos objetos de tipo ReadModel al Dto correspondiente
 para ocultar los campos que no necesitamos que la interfaz u otro conozcan
 ```c#
 public class FindRegistradosEnMateriaHandler : 
-	IRequestHandler<FindRegistradosEnMateriaQuery, List<RegistradoViewModel>>
+        IRequestHandler<FindRegistradosEnMateriaQuery, List<RegistradoDto>>
 {
 	private readonly DbSet<RegistradoReadModel> Registrados;
 	private readonly IMapper _mapper;
@@ -195,23 +198,23 @@ public class FindRegistradosEnMateriaHandler :
 		Registrados = context.Registrados;
 		_mapper = mapper;
 	}
-	public async Task<List<RegistradoViewModel>> Handle(
+	public async Task<List<RegistradoDto>> Handle(
 		FindRegistradosEnMateriaQuery request, CancellationToken cancellationToken)
 	{
 		List<RegistradoReadModel> registrados = await Registrados.AsNoTracking()
 				.Where(x => x.MateriaId == request.MateriaId).ToListAsync();
 
-		List<RegistradoViewModel> model = new List<RegistradoViewModel>();
+		List<RegistradoDto> model = new List<RegistradoDto>();
 		foreach(RegistradoReadModel obj in registrados)
 		{
-			model.Add(_mapper.Map<RegistradoViewModel>(obj));
+			model.Add(_mapper.Map<RegistradoDto>(obj));
 		}
 
 		return model;
 	}
 }
 ```
-En este código se puede ver claramente el uso del mapper para poder crear objetos de tipo ViewModel
+En este código se puede ver claramente el uso del mapper para poder crear objetos de tipo Dto
 que son accesibles desde el mediator. El controlador hará uso de estos handler sin pasar por 
 objetos de tipo ReadModel; esto para evitar que el controlador tenga acceso a atributos que no 
 necesita.
@@ -219,7 +222,7 @@ necesita.
 Aquí tenemos otro ejemplo:
 ```c#
 public class FindAlumnoByNombreHandler : 
-	IRequestHandler<FindAlumnoByNombreQuery, List<AlumnoViewModel>>
+        IRequestHandler<FindAlumnoByNombreQuery, List<AlumnoDto>>
 {
 	private readonly DbSet<AlumnoReadModel> Alumnos;
 	private readonly IMapper _mapper;
@@ -228,7 +231,7 @@ public class FindAlumnoByNombreHandler :
 		Alumnos = context.Alumnos;
 		_mapper = mapper;
 	}
-	public async Task<List<AlumnoViewModel>> Handle(
+	public async Task<List<AlumnoDto>> Handle(
 		FindAlumnoByNombreQuery request, CancellationToken cancellationToken)
 	{
 		List<AlumnoReadModel> alumnos =
@@ -237,11 +240,11 @@ public class FindAlumnoByNombreHandler :
 				.Take(request.Cantidad)
 				.ToListAsync();
 
-		List<AlumnoViewModel> resultado = new List<AlumnoViewModel>();
+		List<AlumnoDto> resultado = new List<AlumnoDto>();
 
 		foreach(AlumnoReadModel alumno in alumnos)
 		{
-			resultado.Add(_mapper.Map<AlumnoViewModel>(alumno));
+			resultado.Add(_mapper.Map<AlumnoDto>(alumno));
 		}
 		
 		return resultado;
@@ -251,10 +254,12 @@ public class FindAlumnoByNombreHandler :
 6. En la inyección de dependencias no olvidarse de añadir la referencia a AutoMapper para que
 pueda leer todas las clases que extienden Profile.
 
+7. 
+
 ## Proyecto Web
 
-El proyecto web se debe crear como siempr lo hacemos con la plantilla correspondiente.
+El proyecto web se debe crear como siempre lo hacemos con la plantilla correspondiente.
 
-1. Hacer el llamado a la inyección de dependencias de los proyectos.
+1. Crear un proyecto web ASP.NET Core Web API
 
 
